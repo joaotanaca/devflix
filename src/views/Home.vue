@@ -1,18 +1,25 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <lista-de-videos />
+    <template v-if="$store.state.embedVideo !== ''">
+      <video-fullscreen />
+    </template>
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import VideoFullsreen from "../components/videoFullScreen.vue";
+import ListaDeVideos from "../components/ListaDeVideos/ListaDeVideos.vue";
 
-export default {
-  name: "Home",
+@Component({
   components: {
-    HelloWorld
+    "video-fullscreen": VideoFullsreen,
+    "lista-de-videos": ListaDeVideos
   }
-};
+})
+export default class Home extends Vue {}
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss"></style>
