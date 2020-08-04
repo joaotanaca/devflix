@@ -1,46 +1,60 @@
 <template>
   <ListaContainer
-    class="container"
     :style="
       backgroundURL(
         this.listVideo().data[this.positionVideo].snippet.thumbnails.high.url,
         'banner'
       )
     "
+    v-if="this.listVideo().data"
   >
-    <Lista :style="positionLeft()">
-      <Video
-        v-for="({
-          snippet: {
-            title,
-            thumbnails: {
-              high: { url }
-            }
+    <div class="container">
+      <Lista :style="positionLeft()">
+        <Video
+          v-for="({
+            snippet: {
+              title,
+              thumbnails: {
+                high: { url }
+              }
+            },
+            etag,
+            id: { videoId }
           },
-          etag,
-          id: { videoId }
-        },
-        index) in listVideo().data"
-        :key="etag"
-        v-on:click="openVideo(videoId)"
-        :style="backgroundURL(url, 'teaser', index)"
-      >
-      </Video>
-    </Lista>
-    <button v-on:click="voltarCarrousel()">Voltar</button>
-    <button v-on:click="proximoCarrousel()">Proximo</button>
+          index) in listVideo().data"
+          :key="etag"
+          v-on:click="openVideo(videoId)"
+          :style="backgroundURL(url, 'teaser', index)"
+        >
+        </Video>
+      </Lista>
+      <PreviousCarrousel v-on:click="voltarCarrousel()">
+        <font-awesome-icon icon="chevron-left" />
+      </PreviousCarrousel>
+      <NextCarrousel v-on:click="proximoCarrousel()">
+        <font-awesome-icon icon="chevron-right" />
+      </NextCarrousel>
+    </div>
   </ListaContainer>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
-import { Lista, Video, ListaContainer } from "./styles";
+import {
+  Lista,
+  Video,
+  ListaContainer,
+  PreviousCarrousel,
+  NextCarrousel
+} from "./styles";
 
 @Component({
   components: {
     Lista,
     Video,
-    ListaContainer
+    ListaContainer,
+    PreviousCarrousel,
+    NextCarrousel
   }
 })
 export default class ListaDeVideos extends Vue {
@@ -63,17 +77,15 @@ export default class ListaDeVideos extends Vue {
   }
 
   positionLeft() {
-    return `left:calc(-${
-      this.positionVideo < 15
-        ? this.positionVideo
-        : this.positionVideo > 19 && (this.positionVideo = 0)
-    } * 200px);`;
+    return `left:calc(-${this.positionVideo} * 210px);`;
   }
   voltarCarrousel() {
-    this.positionVideo -= 1;
+    if (this.positionVideo === 0) this.positionVideo = 19;
+    else this.positionVideo -= 1;
   }
   proximoCarrousel() {
-    this.positionVideo += 1;
+    if (this.positionVideo === 19) return (this.positionVideo = 0);
+    else return (this.positionVideo += 1);
   }
   mounted() {
     this.$store.commit("listVideosYoutube");
